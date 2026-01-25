@@ -17,20 +17,21 @@
         #animatedDoily {
             position: fixed;
             top: 50%; left: 50%;
-            transform: translate(-50%, -50%);
+            /* transform handles centering and scale for maximum smoothness */
+            transform: translate(-50%, -50%) scale(1);
             z-index: 10;
             height: 30vh; 
             width: auto;
             cursor: pointer;
-            /* Instant height changes to prevent "stuttering" during frame swaps */
-            transition: opacity 0.4s ease-in-out; 
+            transition: none; /* Instant swaps during animation */
+            will-change: transform;
         }
 
         #animatedDoily.final {
-            height: 95vh; 
+            /* Scale from 30vh to 95vh */
+            transform: translate(-50%, -50%) scale(3.166);
             z-index: -1; 
             cursor: default;
-            opacity: 0.95; /* Adjust to make doily_6 slightly transparent */
         }
 
         body {
@@ -41,7 +42,7 @@
             overflow: hidden;
         }
 
-        /* 3. The RSVP Content (Scaled down and centered) */
+        /* 3. The RSVP Content */
         .container { 
             width: 40vh; 
             max-width: 80vw;
@@ -57,7 +58,7 @@
             pointer-events: auto;
         }
 
-        /* Text Sizing (20% smaller) */
+        /* Typography */
         h1 { font-size: 0.8rem; font-weight: normal; margin-bottom: 1rem; }
         h2 { font-size: 1rem; font-weight: normal; margin-bottom: 1.5rem; }
         .details { margin-bottom: 1.5rem; line-height: 1.5; font-size: 0.58rem; }
@@ -81,13 +82,40 @@
             width: 90px; padding: 0 2px; color: black; margin-left: 5px; 
         }
 
+        /* RESTORED HOVER EFFECTS */
         .attendance-toggle { 
-            cursor: pointer; margin-top: 8px; display: flex; 
-            justify-content: center; align-items: center; 
-            font-size: 0.65rem; transition: all 0.2s; width: 100%; 
+            cursor: pointer; 
+            margin-top: 8px; 
+            display: flex; 
+            justify-content: center; 
+            align-items: center; 
+            font-size: 0.65rem; 
+            transition: all 0.3s ease; 
+            width: 100%; 
         }
-        .x-mark { width: 12px; margin-right: 4px; opacity: 0; }
-        .attendance-toggle.active .x-mark { opacity: 1; }
+
+        .attendance-toggle:hover { 
+            font-weight: 900; 
+            text-shadow: 0px 0px 8px rgba(0,0,0,0.3); 
+        }
+
+        .x-mark { 
+            width: 12px; 
+            margin-right: 4px; 
+            opacity: 0; 
+            transition: opacity 0.2s ease;
+        }
+
+        /* Show dot on hover OR when clicked (active) */
+        .attendance-toggle:hover .x-mark,
+        .attendance-toggle.active .x-mark { 
+            opacity: 1; 
+        }
+
+        .attendance-toggle.active {
+            font-weight: bold;
+            pointer-events: none; /* Prevent double clicking */
+        }
         
         #errorMessage { color: red; font-size: 0.5rem; margin-top: 6px; display: none; text-transform: none; text-align: center; }
         #successMessage { color: black; font-size: 0.65rem; margin-top: 6px; display: none; text-align: center; }
@@ -121,7 +149,7 @@
             <div class="input-group"><label>Name:</label><input type="text" id="name" spellcheck="false"></div>
             <div class="input-group"><label>Email:</label><input type="email" id="email" spellcheck="false"></div>
             <div class="attendance-toggle" id="rsvpToggle">
-                <span class="x-mark">·</span><span>I will be there.</span>
+                <span class="x-mark">X</span><span>I will be there.</span>
             </div>
             <div id="errorMessage">PLEASE ENTER NAME AND EMAIL</div>
             <div id="successMessage">♡</div>
@@ -133,7 +161,7 @@
         const content = document.getElementById('mainContent');
         const scriptURL = 'https://script.google.com/macros/s/AKfycbziZvz1_hLi_fZtgNCWmr1Py3KiHMSDq-dGWZaH7btYa1Xk6TgfYOYiXkEODlby3kgpJw/exec';
 
-        // Preload all 6 PNG files
+        // Preload
         for (let i = 1; i <= 6; i++) {
             new Image().src = `doily_${i}.png`;
         }
@@ -148,9 +176,9 @@
             const animation = setInterval(() => {
                 frame++;
                 
-                // Jump to the next height instantly to stay in sync with the image swap
-                const newHeight = 30 + ((frame - 1) * (65 / (totalFrames - 1)));
-                doilyImg.style.height = `${newHeight}vh`;
+                // Using transform scale for butter-smooth sizing
+                const scaleProgress = 1 + ((frame - 1) * (2.166 / (totalFrames - 1)));
+                doilyImg.style.transform = `translate(-50%, -50%) scale(${scaleProgress})`;
                 
                 if (frame <= totalFrames) {
                     doilyImg.src = `doily_${frame}.png`;
@@ -187,7 +215,6 @@
             })
             .then(() => {
                 success.style.display = 'block';
-                rsvpToggle.style.pointerEvents = 'none';
             })
             .catch(err => console.error('Error!', err.message));
         });
