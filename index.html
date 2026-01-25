@@ -6,79 +6,98 @@
     <title>RSVP - The Wedding</title>
     <link href="https://fonts.googleapis.com/css2?family=Gotu&display=swap" rel="stylesheet">
     <style>
+        /* 1. Static Cloth Background */
         body::before {
             content: ""; position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-            z-index: -1; background-image: url('doily.jpg');
-            background-size: cover; background-position: center; opacity: 0.5;
+            z-index: -2; background-image: url('cloth-bg.jpg');
+            background-size: cover; background-position: center;
         }
+
+        /* 2. The Animated Doily */
+        #animatedDoily {
+            position: fixed;
+            top: 50%; left: 50%;
+            transform: translate(-50%, -50%);
+            z-index: 10;
+            height: 30vh; 
+            width: auto;
+            cursor: pointer;
+            /* Instant height changes to prevent "stuttering" during frame swaps */
+            transition: opacity 0.4s ease-in-out; 
+        }
+
+        #animatedDoily.final {
+            height: 95vh; 
+            z-index: -1; 
+            cursor: default;
+            opacity: 0.95; /* Adjust to make doily_6 slightly transparent */
+        }
+
         body {
             background-color: white; color: black; font-family: 'Gotu', sans-serif;
             letter-spacing: 0.06em; display: flex; justify-content: center;
             align-items: center; min-height: 100vh; margin: 0;
             text-align: center; text-transform: uppercase;
+            overflow: hidden;
         }
-        .container { max-width: 600px; padding: 40px; }
-        h1 { font-size: 1.2rem; font-weight: normal; margin-bottom: 2rem; }
-        h2 { font-size: 1.5rem; font-weight: normal; margin-bottom: 3rem; }
-        .details { margin-bottom: 2.5rem; line-height: 1.8; font-size: 0.9rem; }
-        .label-small { font-size: 0.65rem; }
-        .underline { text-decoration: underline; text-underline-offset: 3px; }
 
-        .rsvp-form { margin-top: 3rem; display: inline-block; text-align: left; }
-        .input-group { margin-bottom: 12px; font-size: 0.9rem; display: flex; align-items: baseline; }
+        /* 3. The RSVP Content (Scaled down and centered) */
+        .container { 
+            width: 40vh; 
+            max-width: 80vw;
+            padding: 10px; 
+            opacity: 0; 
+            z-index: 5;
+            transition: opacity 0.2s ease-in; 
+            pointer-events: none; 
+        }
+
+        .container.visible {
+            opacity: 1;
+            pointer-events: auto;
+        }
+
+        /* Text Sizing (20% smaller) */
+        h1 { font-size: 0.8rem; font-weight: normal; margin-bottom: 1rem; }
+        h2 { font-size: 1rem; font-weight: normal; margin-bottom: 1.5rem; }
+        .details { margin-bottom: 1.5rem; line-height: 1.5; font-size: 0.58rem; }
+        .label-small { font-size: 0.45rem; }
+        .underline { text-decoration: underline; text-underline-offset: 2px; }
+
+        .rsvp-form { 
+            margin-top: 1rem; 
+            display: flex; 
+            flex-direction: column; 
+            align-items: center; 
+            text-align: left; 
+        }
+        .input-group { margin-bottom: 6px; font-size: 0.65rem; display: flex; align-items: baseline; }
         
-        input {
-            border: none; background: transparent;
-            background-image: linear-gradient(to right, black 60%, rgba(255,255,255,0) 0%);
-            background-position: bottom; background-size: 12px 1px; background-repeat: repeat-x;
-            font-family: 'Gotu', sans-serif; font-size: 0.9rem; outline: none;
-            width: 96px; padding: 0 2px; color: black; margin-left: 8px;
+        input { 
+            border: none; background: transparent; 
+            background-image: linear-gradient(to right, black 60%, rgba(255,255,255,0) 0%); 
+            background-position: bottom; background-size: 8px 1px; background-repeat: repeat-x; 
+            font-family: 'Gotu', sans-serif; font-size: 0.65rem; outline: none; 
+            width: 90px; padding: 0 2px; color: black; margin-left: 5px; 
         }
 
-        .attendance-toggle {
-            cursor: pointer; margin-top: 15px; display: flex; align-items: center;
-            font-size: 0.9rem; transition: all 0.2s;
+        .attendance-toggle { 
+            cursor: pointer; margin-top: 8px; display: flex; 
+            justify-content: center; align-items: center; 
+            font-size: 0.65rem; transition: all 0.2s; width: 100%; 
         }
-        .attendance-toggle:hover { font-weight: 900; text-shadow: 2px 3px 8px rgba(0,0,0,0.4); }
-        .x-mark { width: 20px; margin-right: 8px; font-weight: bold; opacity: 0; }
-        .attendance-toggle:hover .x-mark { opacity: 0.3; }
+        .x-mark { width: 12px; margin-right: 4px; opacity: 0; }
         .attendance-toggle.active .x-mark { opacity: 1; }
-        .attendance-toggle.active { font-weight: bold; }
         
-        #errorMessage { color: red; font-size: 0.7rem; margin-top: 10px; display: none; text-transform: none; }
-
-        #successMessage { color: black; font-size: 0.8rem; margin-top: 10px; display: none; }
-
-        /* Center the form container itself */
-.rsvp-form {
-    margin-top: 3rem;
-    display: flex;
-    flex-direction: column;
-    align-items: center; /* Centers children horizontally */
-    text-align: left;    /* Keeps Name/Email labels aligned left relative to their inputs */
-}
-
-/* Center the "I will be there" toggle */
-.attendance-toggle {
-    cursor: pointer;
-    margin-top: 15px;
-    display: flex;
-    justify-content: center; /* Centers the X and Text inside the toggle */
-    align-items: center;
-    font-size: 0.9rem;
-    transition: all 0.2s;
-    width: 100%; /* Ensures it takes up the full width of the form for centering */
-}
-
-/* Ensure messages center beneath the toggle */
-#errorMessage, #successMessage {
-    text-align: center;
-    width: 100%;
-}
+        #errorMessage { color: red; font-size: 0.5rem; margin-top: 6px; display: none; text-transform: none; text-align: center; }
+        #successMessage { color: black; font-size: 0.65rem; margin-top: 6px; display: none; text-align: center; }
     </style>
 </head>
 <body>
-    <div class="container">
+
+    <img src="doily_1.png" id="animatedDoily" alt="RSVP">
+
+    <div class="container" id="mainContent">
         <h1>RSVP</h1>
         <h2>The Wedding</h2>
 
@@ -88,10 +107,10 @@
                (1st floor CFA building)</p>
             
             <p>
-                Ceremony <span class="underline">starts promptly at 7:30PM.</span> 
-                Please ensure you are in your seats by then. 
-                <span class="underline">Doors close 7:20PM.</span> 
-                Ceremony will be 20 minutes in length; 
+                Ceremony <span class="underline">starts promptly at 7:30PM.</span><br>
+                Please ensure you are in your seats by then.<br>
+                <span class="underline">Doors close 7:20PM.</span><br>
+                Ceremony will be 20 minutes in length;<br>
                 allocate an hour of your evening to The Wedding.
             </p>
 
@@ -99,30 +118,61 @@
         </div>
 
         <div class="rsvp-form">
-            <div class="input-group"><label>Name:</label><input type="text" id="name"></div>
-            <div class="input-group"><label>Email:</label><input type="email" id="email"></div>
+            <div class="input-group"><label>Name:</label><input type="text" id="name" spellcheck="false"></div>
+            <div class="input-group"><label>Email:</label><input type="email" id="email" spellcheck="false"></div>
             <div class="attendance-toggle" id="rsvpToggle">
-                <span class="x-mark">X</span><span>I will be there.</span>
+                <span class="x-mark">·</span><span>I will be there.</span>
             </div>
             <div id="errorMessage">PLEASE ENTER NAME AND EMAIL</div>
             <div id="successMessage">♡</div>
         </div>
     </div>
 
-
-    </div>
-
     <script>
+        const doilyImg = document.getElementById('animatedDoily');
+        const content = document.getElementById('mainContent');
         const scriptURL = 'https://script.google.com/macros/s/AKfycbziZvz1_hLi_fZtgNCWmr1Py3KiHMSDq-dGWZaH7btYa1Xk6TgfYOYiXkEODlby3kgpJw/exec';
-        const rsvpToggle = document.getElementById('rsvpToggle');
 
+        // Preload all 6 PNG files
+        for (let i = 1; i <= 6; i++) {
+            new Image().src = `doily_${i}.png`;
+        }
+
+        doilyImg.addEventListener('click', function() {
+            if (this.classList.contains('final')) return;
+
+            let frame = 1;
+            const totalFrames = 6;
+            const intervalTime = 2500 / totalFrames; 
+
+            const animation = setInterval(() => {
+                frame++;
+                
+                // Jump to the next height instantly to stay in sync with the image swap
+                const newHeight = 30 + ((frame - 1) * (65 / (totalFrames - 1)));
+                doilyImg.style.height = `${newHeight}vh`;
+                
+                if (frame <= totalFrames) {
+                    doilyImg.src = `doily_${frame}.png`;
+                }
+
+                if (frame === totalFrames) {
+                    clearInterval(animation);
+                    doilyImg.classList.add('final');
+                    content.classList.add('visible');
+                }
+            }, intervalTime);
+        });
+
+        // RSVP Submission
+        const rsvpToggle = document.getElementById('rsvpToggle');
         rsvpToggle.addEventListener('click', function() {
             const name = document.getElementById('name').value;
             const email = document.getElementById('email').value;
             const error = document.getElementById('errorMessage');
             const success = document.getElementById('successMessage');
 
-            if (!name || !email) {
+            if (!name.trim() || !email.trim()) {
                 error.style.display = 'block';
                 return;
             }
@@ -130,15 +180,14 @@
             error.style.display = 'none';
             this.classList.add('active');
 
-            // Send data to Google Sheets
             fetch(scriptURL, { 
                 method: 'POST', 
-                mode: 'no-cors', // Essential for Google Apps Script
+                mode: 'no-cors', 
                 body: new URLSearchParams({ 'name': name, 'email': email }) 
             })
             .then(() => {
                 success.style.display = 'block';
-                rsvpToggle.style.pointerEvents = 'none'; // Prevent double submit
+                rsvpToggle.style.pointerEvents = 'none';
             })
             .catch(err => console.error('Error!', err.message));
         });
