@@ -1,0 +1,180 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>RSVP - The Wedding</title>
+    <link href="https://fonts.googleapis.com/css2?family=Gotu&display=swap" rel="stylesheet">
+    <style>
+        /* Background Image Layer */
+        body::before {
+            content: "";
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: -1; /* Keeps it behind the text */
+            background-image: url('doily.jpg');
+            background-size: cover; /* Change to 'contain' if it looks stretched */
+            background-position: center;
+            background-repeat: no-repeat;
+            opacity: 0.5; /* DIAL OPACITY HERE (0.0 to 1.0) */
+        }
+
+        body {
+            background-color: white;
+            color: black;
+            font-family: 'Gotu', sans-serif;
+            letter-spacing: 0.06em;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            margin: 0;
+            text-align: center;
+            text-transform: uppercase;
+        }
+
+        .container {
+            max-width: 600px;
+            padding: 40px;
+            /* Optional: added a tiny white glow to text to ensure 
+               readability over a complex background image */
+            text-shadow: 0 0 10px rgba(255, 255, 255, 0.8);
+        }
+
+        h1 { font-size: 1.2rem; font-weight: normal; margin-bottom: 2rem; }
+        h2 { font-size: 1.2rem; font-weight: normal; margin-bottom: 3rem; }
+
+        .details { margin-bottom: 2.5rem; line-height: 1.8; }
+        .details p { margin: 1rem 0; font-size: 0.9rem; }
+
+        .label-small {
+            font-size: 0.65rem;
+            vertical-align: middle;
+        }
+
+        .underline { text-decoration: underline; text-underline-offset: 3px; }
+
+        .rsvp-form {
+            margin-top: 3rem;
+            display: inline-block;
+            text-align: left;
+        }
+
+        .input-group {
+            margin-bottom: 12px;
+            font-size: 0.9rem;
+            display: flex;
+            align-items: baseline;
+        }
+
+        .input-group label {
+            margin-right: 8px;
+        }
+
+        /* 8-dash underscore */
+        input[type="text"], input[type="email"] {
+            border: none;
+            background: transparent;
+            background-image: linear-gradient(to right, black 60%, rgba(255,255,255,0) 0%);
+            background-position: bottom;
+            background-size: 12px 1px; 
+            background-repeat: repeat-x;
+            font-family: 'Gotu', sans-serif;
+            font-size: 0.9rem;
+            letter-spacing: 0.06em;
+            outline: none;
+            width: 96px; 
+            padding: 0 2px;
+            color: black;
+        }
+
+        /* RSVP Toggle */
+        .attendance-toggle {
+            cursor: pointer;
+            user-select: none;
+            margin-top: 15px;
+            display: flex;
+            align-items: center;
+            font-size: 0.9rem;
+            transition: all 0.2s ease-in-out;
+            padding: 5px 0;
+        }
+
+        .attendance-toggle:hover {
+            font-weight: 900;
+            text-shadow: 2px 3px 8px rgba(0, 0, 0, 0.4);
+        }
+
+        .x-mark {
+            display: inline-block;
+            width: 20px;
+            margin-right: 8px;
+            font-weight: bold;
+            opacity: 0;
+            transition: opacity 0.2s;
+        }
+
+        .attendance-toggle:hover .x-mark {
+            opacity: 0.3;
+        }
+
+        .attendance-toggle.active .x-mark {
+            opacity: 1;
+        }
+
+        .attendance-toggle.active {
+            font-weight: bold;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <h1>RSVP</h1>
+        <h2>The Wedding</h2>
+
+        <div class="details">
+            <p><span class="label-small">Time:</span> Saturday, February 7th, 7pm</p>
+            <p><span class="label-small">Location:</span> Great Hall, 4919 Frew St, PA 15213.<br>
+               (1st floor CFA building)</p>
+            
+            <p>
+                Ceremony <span class="underline">starts promptly at 7:30PM.</span> 
+                Please ensure you are in your seats by then. 
+                <span class="underline">Doors close 7:20PM.</span> 
+                Ceremony will be 20 minutes in length; 
+                allocate an hour of your evening to The Wedding.
+            </p>
+
+            <p class="underline">Please come dressed in black.</p>
+        </div>
+
+        <div class="rsvp-form">
+            <div class="input-group">
+                <label for="name">Name:</label>
+                <input type="text" id="name" spellcheck="false">
+            </div>
+            <div class="input-group">
+                <label for="email">Email:</label>
+                <input type="email" id="email" spellcheck="false">
+            </div>
+            
+            <div class="attendance-toggle" id="rsvpToggle">
+                <span class="x-mark">X</span>
+                <span>I will be there.</span>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const rsvpToggle = document.getElementById('rsvpToggle');
+        rsvpToggle.addEventListener('click', function() {
+            this.classList.toggle('active');
+        });
+    </script>
+
+</body>
+</html>
