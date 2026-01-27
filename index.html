@@ -6,30 +6,26 @@
     <title>RSVP - The Wedding</title>
     <link href="https://fonts.googleapis.com/css2?family=Gotu&display=swap" rel="stylesheet">
     <style>
-        /* 1. Static Cloth Background */
         body::before {
             content: ""; position: fixed; top: 0; left: 0; width: 100%; height: 100%;
             z-index: -2; background-image: url('cloth-bg.jpg');
             background-size: cover; background-position: center;
         }
 
-        /* 2. The Animated Doily */
         #animatedDoily {
             position: fixed;
             top: 50%; left: 50%;
-            /* transform handles centering and scale for maximum smoothness */
             transform: translate(-50%, -50%) scale(1);
             z-index: 10;
             height: 30vh; 
             width: auto;
             cursor: pointer;
-            transition: none; /* Instant swaps during animation */
+            transition: none;
             will-change: transform;
         }
 
         #animatedDoily.final {
-            /* Scale from 30vh to 95vh */
-            transform: translate(-50%, -50%) scale(3.166);
+            transform: translate(-50%, -50%) scale(3.16);
             z-index: -1; 
             cursor: default;
         }
@@ -42,47 +38,104 @@
             overflow: hidden;
         }
 
-        /* 3. The RSVP Content */
         .container { 
-            width: 40vh; 
-            max-width: 80vw;
+            width: 44vh; 
+            max-width: 85vw;
             padding: 10px; 
             opacity: 0; 
             z-index: 5;
             transition: opacity 0.2s ease-in; 
             pointer-events: none; 
+            display: flex;
+            flex-direction: column;
+            align-items: center;
         }
 
-        .container.visible {
-            opacity: 1;
-            pointer-events: auto;
+        .container.visible { opacity: 1; pointer-events: auto; }
+
+        /* Top section moved down slightly from previous -8vh */
+        .top-section {
+            margin-top: 7vh; 
+            width: 100%;
         }
 
-        /* Typography */
-        h1 { font-size: 0.8rem; font-weight: normal; margin-bottom: 1rem; }
-        h2 { font-size: 1rem; font-weight: normal; margin-bottom: 1.5rem; }
-        .details { margin-bottom: 1.5rem; line-height: 1.5; font-size: 0.58rem; }
-        .label-small { font-size: 0.45rem; }
+        h1 { font-size: 0.75rem; margin: 0; font-weight: normal; }
+        h2 { font-size: 0.95rem; margin: 5px 0 25px 0; font-weight: normal; }
+        
+        /* Added more space before time/location */
+        .logistics { 
+            font-size: 0.65rem; 
+            margin-top: 3em;
+            margin-bottom: 5em; 
+            line-height: 1.6;
+        }
+
+        .label-small { 
+            font-size: 0.45rem; 
+            display: block; 
+            margin-bottom: 2px; 
+            opacity: 0.8;
+        }
+
+        .details { 
+            font-size: 0.52rem; 
+            line-height: 1.8; /* Increased slightly for better readability with justification */
+            margin-top: 8vh; 
+            
+            /* CHANGE WIDTH HERE: Lowering this makes the text block narrower */
+            width: 60%; 
+            margin-left: auto;
+            margin-right: auto;
+
+            text-align: justify;
+            text-justify: inter-word;
+            text-transform: uppercase;
+            hyphens: auto; /* Helps prevent giant gaps by breaking long words if needed */
+            letter-spacing: 0.04em;
+        }
+
+        /* This forces the browser to justify every line, even with <br> */
+        .details p {
+            text-align: justify;
+            text-align-last: center;
+        }
+
+        /* This specifically ensures the "Dressed in Black" stays centered */
+        .details p.underline {
+            text-align: center;
+            text-align-last: center;
+            display: block;
+            margin-top: 15px;
+        }
+
         .underline { text-decoration: underline; text-underline-offset: 2px; }
 
+        /* Added space before the input form */
         .rsvp-form { 
-            margin-top: 1rem; 
+            width: 100%;
             display: flex; 
             flex-direction: column; 
             align-items: center; 
-            text-align: left; 
+            margin-top: -2em;
         }
-        .input-group { margin-bottom: 6px; font-size: 0.65rem; display: flex; align-items: baseline; }
+
+        .input-group { 
+            margin-bottom: 8px; 
+            font-size: 0.65rem; 
+            display: flex; 
+            align-items: baseline; 
+            width: 100%;
+            justify-content: center;
+        }
         
         input { 
             border: none; background: transparent; 
             background-image: linear-gradient(to right, black 60%, rgba(255,255,255,0) 0%); 
-            background-position: bottom; background-size: 8px 1px; background-repeat: repeat-x; 
+            background-position: bottom; background-size: 6px 1px; background-repeat: repeat-x; 
             font-family: 'Gotu', sans-serif; font-size: 0.65rem; outline: none; 
-            width: 90px; padding: 0 2px; color: black; margin-left: 5px; 
+            width: 110px; padding: 0 2px; color: black; margin-left: 5px; 
         }
 
-        /* RESTORED HOVER EFFECTS */
         .attendance-toggle { 
             cursor: pointer; 
             margin-top: 8px; 
@@ -90,35 +143,27 @@
             justify-content: center; 
             align-items: center; 
             font-size: 0.65rem; 
-            transition: all 0.3s ease; 
-            width: 100%; 
+            transition: all 0.2s ease; 
         }
 
         .attendance-toggle:hover { 
-            font-weight: 900; 
-            text-shadow: 0px 0px 8px rgba(0,0,0,0.3); 
+            text-shadow: 0px 0px 10px rgba(0,0,0,0.2);
+            font-weight: bold;
         }
 
         .x-mark { 
-            width: 12px; 
-            margin-right: 4px; 
+            font-size: 0.6rem;
+            margin-right: 6px; 
             opacity: 0; 
             transition: opacity 0.2s ease;
         }
 
-        /* Show dot on hover OR when clicked (active) */
         .attendance-toggle:hover .x-mark,
-        .attendance-toggle.active .x-mark { 
-            opacity: 1; 
-        }
-
-        .attendance-toggle.active {
-            font-weight: bold;
-            pointer-events: none; /* Prevent double clicking */
-        }
+        .attendance-toggle.active .x-mark { opacity: 1; }
         
-        #errorMessage { color: red; font-size: 0.5rem; margin-top: 6px; display: none; text-transform: none; text-align: center; }
-        #successMessage { color: black; font-size: 0.65rem; margin-top: 6px; display: none; text-align: center; }
+        #errorMessage { color: #6E111F; font-size: 0.45rem; margin-top: 8px; display: none; text-transform: none; }
+        #successMessage { font-size: 0.8rem; margin-top: 8px; display: none; }
+
     </style>
 </head>
 <body>
@@ -126,33 +171,45 @@
     <img src="doily_1.png" id="animatedDoily" alt="RSVP">
 
     <div class="container" id="mainContent">
-        <h1>RSVP</h1>
-        <h2>The Wedding</h2>
-
-        <div class="details">
-            <p><span class="label-small">Time:</span> Saturday, February 7th, 7pm</p>
-            <p><span class="label-small">Location:</span> Great Hall, 4919 Frew St, PA 15213.<br>
-               (1st floor CFA building)</p>
+        <div class="top-section">
+            <h1>RSVP</h1>
+            <h2>The Wedding</h2>
             
-            <p>
-                Ceremony <span class="underline">starts promptly at 7:30PM.</span><br>
-                Please ensure you are in your seats by then.<br>
-                <span class="underline">Doors close 7:20PM.</span><br>
-                Ceremony will be 20 minutes in length;<br>
-                allocate an hour of your evening to The Wedding.
-            </p>
+            <div class="logistics">
+                <p>
+                    <span class="label-small">Time:</span> 
+                    Saturday, February 7th,<br>7pm
+                </p>
+                <p>
+                    <span class="label-small">Location:</span> 
+                    Great Hall, 4919 Frew St, PA 15213<br>
+                    <span class="label-small">(1st floor CFA building)</span> 
+                </p>
+            </div>
 
-            <p class="underline">Please come dressed in black.</p>
+            <div class="rsvp-form">
+                <div class="input-group"><label>Name:</label><input type="text" id="name" spellcheck="false"></div>
+                <div class="input-group"><label>Email:</label><input type="email" id="email" spellcheck="false"></div>
+                <div class="attendance-toggle" id="rsvpToggle">
+                    <span class="x-mark">X</span><span>I will be there.</span>
+                </div>
+                <div id="errorMessage">PLEASE ENTER NAME AND EMAIL</div>
+                <div id="successMessage">♡</div>
+            </div>
         </div>
 
-        <div class="rsvp-form">
-            <div class="input-group"><label>Name:</label><input type="text" id="name" spellcheck="false"></div>
-            <div class="input-group"><label>Email:</label><input type="email" id="email" spellcheck="false"></div>
-            <div class="attendance-toggle" id="rsvpToggle">
-                <span class="x-mark">X</span><span>I will be there.</span>
-            </div>
-            <div id="errorMessage">PLEASE ENTER NAME AND EMAIL</div>
-            <div id="successMessage">♡</div>
+        <div class="details">
+            <p>
+                Ceremony <span class="underline">starts promptly at 7:30PM.</span> Please ensure you are in your seats by then.
+            </p>
+            <p>
+                <span class="underline">Doors close 7:20PM.</span>
+            </p>
+            <p>
+                Ceremony will be 20 minutes in length;
+                allocate an hour of your evening to The Wedding.
+            </p>
+            <p class="underline">Please come dressed in black.</p>
         </div>
     </div>
 
@@ -161,24 +218,20 @@
         const content = document.getElementById('mainContent');
         const scriptURL = 'https://script.google.com/macros/s/AKfycbziZvz1_hLi_fZtgNCWmr1Py3KiHMSDq-dGWZaH7btYa1Xk6TgfYOYiXkEODlby3kgpJw/exec';
 
-        // Preload
         for (let i = 1; i <= 6; i++) {
             new Image().src = `doily_${i}.png`;
         }
 
         doilyImg.addEventListener('click', function() {
             if (this.classList.contains('final')) return;
-
             let frame = 1;
             const totalFrames = 6;
             const intervalTime = 2500 / totalFrames; 
 
             const animation = setInterval(() => {
                 frame++;
-                
-                // Using transform scale for butter-smooth sizing
-                const scaleProgress = 1 + ((frame - 1) * (2.166 / (totalFrames - 1)));
-                doilyImg.style.transform = `translate(-50%, -50%) scale(${scaleProgress})`;
+                const scaleValue = 1 + ((frame - 1) * (2.16 / (totalFrames - 1)));
+                doilyImg.style.transform = `translate(-50%, -50%) scale(${scaleValue})`;
                 
                 if (frame <= totalFrames) {
                     doilyImg.src = `doily_${frame}.png`;
@@ -192,7 +245,6 @@
             }, intervalTime);
         });
 
-        // RSVP Submission
         const rsvpToggle = document.getElementById('rsvpToggle');
         rsvpToggle.addEventListener('click', function() {
             const name = document.getElementById('name').value;
@@ -200,23 +252,25 @@
             const error = document.getElementById('errorMessage');
             const success = document.getElementById('successMessage');
 
+            // 1. Validation Check
             if (!name.trim() || !email.trim()) {
                 error.style.display = 'block';
                 return;
             }
 
+            // 2. Immediate Visual Feedback
             error.style.display = 'none';
+            success.style.display = 'block'; // Show heart instantly
             this.classList.add('active');
+            this.style.pointerEvents = 'none'; // Disable further clicks
 
+            // 3. Background Data Submission
             fetch(scriptURL, { 
                 method: 'POST', 
                 mode: 'no-cors', 
                 body: new URLSearchParams({ 'name': name, 'email': email }) 
             })
-            .then(() => {
-                success.style.display = 'block';
-            })
-            .catch(err => console.error('Error!', err.message));
+            .catch(err => console.error('Data failed to send in background:', err.message));
         });
     </script>
 </body>
