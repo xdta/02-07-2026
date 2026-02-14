@@ -34,8 +34,9 @@
         }
     
         .container { 
-            width: 45vw; 
-            max-width: 800px; 
+            /* Tightened to 25vw to stay inside doily on live deployment */
+            width: 25vw; 
+            max-width: 450px; 
             padding: 20px; 
             opacity: 1;
             z-index: 5;
@@ -51,7 +52,7 @@
         .message-text {
             font-size: 0.65vw; 
             line-height: 1.8;
-            margin-bottom: 1.5vw;
+            margin-bottom: 1.2vw;
             text-transform: none; 
             font-weight: 300;
             opacity: 0.7; 
@@ -66,16 +67,16 @@
         
         input { 
             border: none; background: transparent; 
-            /* Widened the dash to 1.2vw and the line thickness to 1px */
+            /* Wider dash: 1.2vw background size with 60% fill */
             background-image: linear-gradient(to right, #4b4b4b 60%, rgba(255,255,255,0) 0%); 
             background-position: bottom; 
-            background-size: 0.7vw 1px; 
+            background-size: 1.2vw 1px; 
             background-repeat: repeat-x; 
             font-family: 'Gotu', sans-serif; 
             font-size: 0.8vw; 
             outline: none; 
             width: 100%; 
-            max-width: 12vw; /* Slightly wider to accommodate wider dashes */
+            max-width: 10vw; 
             padding: 0vw 0; 
             color: #4b4b4b; 
             text-align: center;
@@ -92,8 +93,8 @@
             border: none;
             font-family: 'Gotu', sans-serif;
             text-transform: uppercase;
-            /* Reduced margin to bring it closer to the entry line */
-            margin-top: 1vw; 
+            /* Reduced margin to pull it closer to entry line */
+            margin-top: 0.6vw; 
             transition: opacity 0.3s;
             opacity: 0.5;
         }
@@ -103,16 +104,16 @@
         #errorMessage {
             color: #942536;
             font-size: 0.6vw;
-            margin-top: 0.5vw;
+            margin-top: 0.4vw;
             display: none;
             text-transform: none;
         }
     
         @media screen and (max-width: 800px) {
-            .container { width: 85vw; max-width: 85vw; }
-            .message-text { font-size: 0.9rem; line-height: 1.5; }
+            .container { width: 75vw; max-width: 75vw; }
+            .message-text { font-size: 0.9rem; line-height: 1.6; }
             input { font-size: 1.1rem; max-width: 180px; background-size: 15px 1px; }
-            .submit-btn { font-size: 0.7rem; margin-top: 15px; }
+            .submit-btn { font-size: 0.7rem; margin-top: 10px; }
         }
     </style>
 </head>
@@ -122,8 +123,10 @@
 
     <div class="container" id="mainContent">
         <div class="message-text">
-            To say goodbye, please leave us one word—perhaps a name that was or is on your mind, perhaps not <br>
-            ⋆˙⟡
+            To say goodbye, please send us one word<br>
+            Perhaps a name that was on your mind that Day <br>
+            or Today <br>
+            or perhaps not⋆˙⟡
         </div>
 
         <div class="input-group">
@@ -134,7 +137,7 @@
     </div>
 
     <script>
-        const startTime = Date.now(); // Start clock immediately
+        const startTime = Date.now(); 
         const doilyImg = document.getElementById('animatedDoily');
         const content = document.getElementById('mainContent');
         const submitBtn = document.getElementById('submitBtn');
@@ -154,7 +157,6 @@
             }
             error.style.display = 'none';
 
-            // Calculate duration with 3 decimal places
             const duration = ((Date.now() - startTime) / 1000).toFixed(3) + "s";
 
             content.classList.add('hidden');
