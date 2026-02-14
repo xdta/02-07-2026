@@ -1,0 +1,370 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>RSVP - The Wedding</title>
+  <link href="https://fonts.googleapis.com/css2?family=Gotu&display=swap" rel="stylesheet">
+
+  <style>
+    /* Background */
+    body::before{
+      content:"";
+      position:fixed;
+      inset:0;
+      z-index:-2;
+      background-image:url("cloth-bg.jpg");
+      background-size:cover;
+      background-position:center;
+    }
+
+    body{
+      margin:0;
+      background:white;
+      color:black;
+      font-family:"Gotu", sans-serif;
+      letter-spacing:0.06em;
+      text-align:center;
+      text-transform:uppercase;
+      overflow:hidden;
+    }
+
+    /* --- ONE SHARED COORDINATE SYSTEM (image + text) --- */
+    #doilyStage{
+      position:fixed;
+      left:50%;
+      top:50%;
+      transform:translate(-50%,-50%);
+      transform-origin:center;
+      z-index:10;
+
+      /* Start small; JS animates to 90vh */
+      height:30vh;
+      max-height:90vh;
+      max-width:90vw;
+
+      display:grid;
+      place-items:center;
+    }
+
+    /* Overlay image + text in same grid cell */
+    #doilyStage > *{
+      grid-area:1 / 1;
+    }
+
+    /* Image fills stage height; width follows aspect ratio */
+    #animatedDoily{
+      height:100%;
+      width:auto;
+      max-width:100%;
+      object-fit:contain;
+      display:block;
+      cursor:pointer;
+      z-index:0;
+      user-select:none;
+      -webkit-user-drag:none;
+    }
+
+    /* Container is just an overlay; the *real* text layout box is inside it */
+    .container{
+      position:relative;
+      z-index:1;
+      width:100%;
+      height:100%;
+      opacity:0;
+      pointer-events:none;
+      transition:opacity 0.2s ease-in;
+    }
+
+    .container.visible{
+      opacity:1;
+      pointer-events:auto;
+    }
+
+    /* -----------------------------
+       THE STABLE “TEXT AREA” YOU ASKED FOR
+       centered, 50% width, 60% height
+    ------------------------------ */
+/* 1. Increase the BASE font size for the box */
+.textBox {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  transform: translate(-50%, -50%);
+  width: 55%; /* Slightly widened to prevent text from bunching up */
+  height: 60%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 1.6em;
+  text-align: center;
+
+  /* INCREASE THIS: The starting scale before the animation ends */
+  font-size: 1.5em; 
+}
+
+/* 2. Increase the FINAL font size after animation */
+#doilyStage.final .textBox {
+  /* INCREASE THIS: Try 2.2em or 2.5em depending on how "big" you want it */
+  font-size: 2.2em; 
+}
+
+    /* --------------------------------
+       Typography (use EM so it scales with .textBox font-size)
+    --------------------------------- */
+    h1{ font-size:0.75em; margin:0; font-weight:normal; }
+    h2{ font-size:1.05em; margin:0.4em 0 1.3em 0; font-weight:normal; }
+
+    .logistics{
+      font-size:0.72em;
+      line-height:1.6;
+      margin:0;
+    }
+
+    .logistics p{ margin:0.9em 0; }
+
+    .label-small{
+      font-size:0.62em;
+      display:block;
+      margin-bottom:0.25em;
+      opacity:0.8;
+    }
+
+    .rsvp-form{
+      width:100%;
+      display:flex;
+      flex-direction:column;
+      align-items:center;
+      margin:0.6em 0 0 0;
+      gap:0.6em;
+    }
+
+    .input-group{
+      font-size:0.72em;
+      display:flex;
+      align-items:baseline;
+      justify-content:center;
+      gap:0.6em;
+      width:100%;
+      margin:0;
+    }
+
+    input{
+      border:none;
+      background:transparent;
+
+      background-image:linear-gradient(to right, black 60%, rgba(255,255,255,0) 0%);
+      background-position:bottom;
+      background-size:6px 1px;
+      background-repeat:repeat-x;
+
+      font-family:"Gotu", sans-serif;
+      font-size:1em;
+      outline:none;
+
+      width:8.5em;            /* scales with text now */
+      padding:0 0.2em;
+      color:black;
+      text-transform:uppercase;
+    }
+
+    .attendance-toggle{
+      cursor:pointer;
+      display:flex;
+      justify-content:center;
+      align-items:center;
+      font-size:0.72em;
+      transition:all 0.2s ease;
+      margin-top:0.2em;
+    }
+
+    .attendance-toggle:hover{
+      text-shadow:0 0 10px rgba(0,0,0,0.2);
+      font-weight:bold;
+    }
+
+    .x-mark{
+      font-size:0.92em;
+      margin-right:0.5em;
+      opacity:0;
+      transition:opacity 0.2s ease;
+    }
+
+    .attendance-toggle:hover .x-mark,
+    .attendance-toggle.active .x-mark{ opacity:1; }
+
+    #errorMessage{
+      color:#6E111F;
+      font-size:0.62em;
+      margin-top:0.2em;
+      display:none;
+      text-transform:none;
+    }
+
+    #successMessage{
+      font-size:1.1em;
+      margin-top:0.2em;
+      display:none;
+    }
+
+    .details{
+      width:100%;
+      font-size:0.62em;
+      line-height:1.8;
+      letter-spacing:0.04em;
+      margin:0;
+    }
+
+    .details p{
+      margin:0.8em 0;
+      text-align:justify;
+      text-align-last:center;
+    }
+
+    .details p.underline{
+      text-align:center;
+      text-align-last:center;
+      margin-top:1.2em;
+    }
+
+    .underline{
+      text-decoration:underline;
+      text-underline-offset:2px;
+    }
+  </style>
+</head>
+
+<body>
+  <div id="doilyStage">
+    <img src="doily_1.png" id="animatedDoily" alt="RSVP">
+
+    <div class="container" id="mainContent">
+      <!-- This is the stable centered box -->
+      <div class="textBox">
+        <!-- TOP CONTENT -->
+        <div class="top-section">
+          <h1>RSVP</h1>
+          <h2>The Wedding</h2>
+
+          <div class="logistics">
+            <p>
+              <span class="label-small">Time:</span>
+              Saturday, February 7th,<br>7pm
+            </p>
+            <p>
+              <span class="label-small">Location:</span>
+              Great Hall, 4919 Frew St, PA 15213<br>
+              <span class="label-small">(1st floor CFA building)</span>
+            </p>
+          </div>
+
+          <div class="rsvp-form">
+            <div class="input-group">
+              <label>Name:</label>
+              <input type="text" id="name" spellcheck="false">
+            </div>
+
+            <div class="input-group">
+              <label>Email:</label>
+              <input type="email" id="email" spellcheck="false">
+            </div>
+
+            <div class="attendance-toggle" id="rsvpToggle">
+              <span class="x-mark">X</span><span>I will be there.</span>
+            </div>
+
+            <div id="errorMessage">PLEASE ENTER NAME AND EMAIL</div>
+            <div id="successMessage">♡</div>
+          </div>
+        </div>
+
+        <!-- BOTTOM DETAILS -->
+        <div class="details">
+          <p>
+            Ceremony <span class="underline">starts promptly at 7:30PM.</span> Please ensure you are in your seats by then.
+          </p>
+          <p>
+            <span class="underline">Doors close 7:20PM.</span>
+          </p>
+          <p>
+            Ceremony will be 20 minutes in length;
+            allocate an hour of your evening to The Wedding.
+          </p>
+          <p class="underline">Please come dressed in black.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    const doilyStage = document.getElementById('doilyStage');
+    const doilyImg = document.getElementById('animatedDoily');
+    const content = document.getElementById('mainContent');
+
+    const scriptURL = 'https://script.google.com/macros/s/AKfycbziZvz1_hLi_fZtgNCWmr1Py3KiHMSDq-dGWZaH7btYa1Xk6TgfYOYiXkEODlby3kgpJw/exec';
+
+    // Preload frames
+    for (let i = 1; i <= 6; i++) {
+      const img = new Image();
+      img.src = `doily_${i}.png`;
+    }
+
+    // Animate doily growth 30vh -> 90vh while swapping frames
+    doilyImg.addEventListener('click', function () {
+      if (doilyStage.classList.contains('final')) return;
+
+      let frame = 1;
+      const totalFrames = 6;
+      const intervalTime = 2500 / totalFrames;
+
+      const startH = 30; // vh
+      const endH = 90;   // vh
+
+      const animation = setInterval(() => {
+        frame++;
+
+        if (frame <= totalFrames) {
+          doilyImg.src = `doily_${frame}.png`;
+        }
+
+        const t = (frame - 1) / (totalFrames - 1); // 0..1
+        const h = startH + t * (endH - startH);
+        doilyStage.style.height = `${h}vh`;
+
+        if (frame === totalFrames) {
+          clearInterval(animation);
+          doilyStage.classList.add('final');
+          content.classList.add('visible');
+          doilyImg.style.cursor = 'default';
+        }
+      }, intervalTime);
+    });
+
+    // RSVP
+    const rsvpToggle = document.getElementById('rsvpToggle');
+    rsvpToggle.addEventListener('click', function () {
+      const name = document.getElementById('name').value;
+      const email = document.getElementById('email').value;
+      const error = document.getElementById('errorMessage');
+      const success = document.getElementById('successMessage');
+
+      if (!name.trim() || !email.trim()) {
+        error.style.display = 'block';
+        return;
+      }
+
+      error.style.display = 'none';
+      success.style.display = 'block';
+      this.classList.add('active');
+      this.style.pointerEvents = 'none';
+
+      fetch(scriptURL, {
+        method: 'POST',
+        mode: 'no-cors',
+        body: new URLSearchParams({ name, email })
+      }).catch(err => console.error('Data failed to send in background:', err.message));
+    });
+  </script>
+</body>
+</html>
