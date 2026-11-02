@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Waiting</title>
+    <title>RSVP - The Wedding</title>
     <link href="https://fonts.googleapis.com/css2?family=Gotu&display=swap" rel="stylesheet">
     <style>
         body::before {
@@ -15,185 +15,271 @@
         #animatedDoily {
             position: fixed;
             top: 50%; left: 50%;
-            transform: translate(-50%, -50%) scale(3.16);
-            z-index: -1; 
+            transform: translate(-50%, -50%) scale(1);
+            z-index: 10;
             height: 30vh; 
             width: auto;
+            cursor: pointer;
+            transition: none;
             will-change: transform;
         }
     
+        #animatedDoily.final {
+            transform: translate(-50%, -50%) scale(3.16);
+            z-index: -1; 
+            cursor: default;
+        }
+    
         body {
-            background-color: white; 
-            color: #4b4b4b; 
-            font-family: 'Gotu', sans-serif;
-            letter-spacing: 0.15em; 
-            display: flex; justify-content: center;
+            background-color: white; color: black; font-family: 'Gotu', sans-serif;
+            letter-spacing: 0.08em; display: flex; justify-content: center;
             align-items: center; min-height: 100vh; margin: 0;
             text-align: center; text-transform: uppercase;
-            overflow: hidden;
+            overflow-x: hidden;
         }
     
         .container { 
-            /* Strict constraint: keeping it narrow so it stays in the 'hole' */
-            width: 22vw; 
-            max-width: 350px; 
-            padding: 0; 
-            opacity: 1;
+            /* Widened container to allow the text to breathe inside the doily */
+            width: 100vh; 
+            max-width: 90vw;
+            padding: 20px; 
+            opacity: 0; 
             z-index: 5;
-            transition: opacity 1.5s ease-out; 
+            transition: opacity 0.2s ease-in; 
+            pointer-events: none; 
             display: flex;
             flex-direction: column;
             align-items: center;
             box-sizing: border-box;
         }
     
-        .container.hidden { opacity: 0; pointer-events: none; }
+        .container.visible { opacity: 1; pointer-events: auto; }
     
-        .message-text {
-            /* Reduced from 0.65vw to 0.5vw for that 75%-zoom look at 100% scale */
-            font-size: 0.65vw; 
-            line-height: 1.8;
-            margin-bottom: 1vw;
-            text-transform: none; 
-            font-weight: 300;
-            opacity: 0.7; 
+        .top-section {
+            margin-top: 2vh; 
             width: 100%;
         }
     
-        .input-group { 
-            display: flex; 
-            flex-direction: column;
-            align-items: center; 
+        /* Clean, Large Typography */
+        h1 { font-size: 1.8rem; margin: 0; font-weight: normal; letter-spacing: 0.2em; }
+        h2 { font-size: 2.2rem; margin: 10px 0 35px 0; font-weight: normal; }
+        
+        .logistics { 
+            font-size: 1.1rem; 
+            margin-top: 2em;
+            margin-bottom: 2.5em; 
+            line-height: 1.8;
+        }
+    
+        .label-small { 
+            font-size: 0.75rem; 
+            display: block; 
+            margin-bottom: 4px; 
+            opacity: 0.7;
+        }
+    
+        .details { 
+            /* Constrained to 90% as requested */
+            width: 90%; 
+            font-size: 0.95rem; 
+            line-height: 1.7; 
+            margin-top: 5vh; 
+            margin-left: auto;
+            margin-right: auto;
+            text-align: justify;
+            text-justify: inter-word;
+            text-transform: uppercase;
+            letter-spacing: 0.04em;
+        }
+    
+        .details p {
+            text-align: justify;
+            text-align-last: center;
+            margin-bottom: 1.2em;
+        }
+    
+        .details p.underline {
+            text-align: center;
+            text-align-last: center;
+            display: block;
+            margin-top: 25px;
+        }
+    
+        .underline { text-decoration: underline; text-underline-offset: 3px; }
+    
+        /* RSVP Form Scaling */
+        .rsvp-form { 
             width: 100%;
+            display: flex; 
+            flex-direction: column; 
+            align-items: center; 
+            margin-top: -1em;
+        }
+    
+        .input-group { 
+            margin-bottom: 15px; 
+            font-size: 1.1rem; 
+            display: flex; 
+            align-items: baseline; 
+            width: 100%;
+            justify-content: center;
         }
         
         input { 
             border: none; background: transparent; 
-            /* Wider dash styling */
-            background-image: linear-gradient(to right, #4b4b4b 60%, rgba(255,255,255,0) 0%); 
-            background-position: bottom; 
-            background-size: 0.6vw 1px; 
-            background-repeat: repeat-x; 
-            font-family: 'Gotu', sans-serif; 
-            font-size: 0.65vw; 
-            outline: none; 
-            width: 100%; 
-            max-width: 8vw; 
-            padding: 0.2vw 0; 
-            color: #4b4b4b; 
-            text-align: center;
-            opacity: 0.8;
+            background-image: linear-gradient(to right, black 60%, rgba(255,255,255,0) 0%); 
+            background-position: bottom; background-size: 8px 1px; background-repeat: repeat-x; 
+            font-family: 'Gotu', sans-serif; font-size: 1.1rem; outline: none; 
+            width: 220px; padding: 0 5px; color: black; margin-left: 10px; 
         }
     
-        .submit-btn {
-            cursor: pointer;
-            font-size: 0.5vw; 
-            letter-spacing: 0.4vw;
-            text-decoration: none;
-            color: #4b4b4b;
-            background: none;
-            border: none;
-            font-family: 'Gotu', sans-serif;
-            text-transform: uppercase;
-            margin-top: 0.6vw; 
-            transition: opacity 0.3s;
-            opacity: 0.5;
+        .attendance-toggle { 
+            cursor: pointer; 
+            margin-top: 15px; 
+            display: flex; 
+            justify-content: center; 
+            align-items: center; 
+            font-size: 1.1rem; 
+            transition: all 0.2s ease; 
         }
     
-        .submit-btn:hover { opacity: 1; }
-    
-        #errorMessage {
-            color: #942536;
-            font-size: 0.4vw;
-            margin-top: 0.4vw;
-            display: none;
-            text-transform: none;
+        .x-mark { 
+            font-size: 1rem;
+            margin-right: 10px; 
+            opacity: 0; 
+            transition: opacity 0.2s ease;
         }
     
-        /* Mobile: Kept as-is since you mentioned it looks okay */
-        @media screen and (max-width: 800px) {
-            .container { width: 70vw; max-width: 70vw; }
-            .message-text { font-size: 0.7rem; line-height: 1.5; }
-            input { font-size: 0.7rem; max-width: 150px; background-size: 15px 1px; }
-            .submit-btn { font-size: 0.7rem; margin-top: 15px; }
-            .errorMessage { font-size: 0.5rem; margin-top: 15px; }
+        .attendance-toggle.active .x-mark { opacity: 1; }
+        
+        #errorMessage { color: #6E111F; font-size: 0.8rem; margin-top: 10px; display: none; text-transform: none; }
+        #successMessage { font-size: 1.5rem; margin-top: 10px; display: none; }
+    
+        /* MOBILE PORTRAIT OVERRIDES */
+        @media screen and (max-width: 600px) and (orientation: portrait) {
+            body {
+                overflow-y: auto;
+                align-items: flex-start;
+            }
+            .container {
+                width: 100%;
+                padding: 100px 30px; /* Strong top/bottom padding for mobile */
+            }
+            h1 { font-size: 1.4rem; }
+            h2 { font-size: 1.6rem; }
+            .logistics, .input-group, input, .attendance-toggle { font-size: 0.9rem; }
+            input { width: 140px; }
+            .details { font-size: 0.75rem; width: 92%; line-height: 1.6; }
         }
     </style>
 </head>
 <body>
 
-    <img src="doily_6.png" id="animatedDoily" alt="Doily">
+    <img src="doily_1.png" id="animatedDoily" alt="RSVP">
 
     <div class="container" id="mainContent">
-        <div class="message-text">
-            Before you go, please leave one word behind<br>
-            Perhaps a name that was on your mind that Day <br>
-            or Today—<br>
-            <br>⋆˙⟡
+        <div class="top-section">
+            <h1>RSVP</h1>
+            <h2>The Wedding</h2>
+            
+            <div class="logistics">
+                <p>
+                    <span class="label-small">Time:</span> 
+                    Saturday, February 7th,<br>7pm
+                </p>
+                <p>
+                    <span class="label-small">Location:</span> 
+                    Great Hall, 4919 Frew St, PA 15213<br>
+                    <span class="label-small">(1st floor CFA building)</span> 
+                </p>
+            </div>
+
+            <div class="rsvp-form">
+                <div class="input-group"><label>Name:</label><input type="text" id="name" spellcheck="false"></div>
+                <div class="input-group"><label>Email:</label><input type="email" id="email" spellcheck="false"></div>
+                <div class="attendance-toggle" id="rsvpToggle">
+                    <span class="x-mark">X</span><span>I will be there.</span>
+                </div>
+                <div id="errorMessage">PLEASE ENTER NAME AND EMAIL</div>
+                <div id="successMessage">♡</div>
+            </div>
         </div>
 
-        <div class="input-group">
-            <input type="text" id="farewellWord" spellcheck="false" autocomplete="off">
-            <div id="errorMessage">Please leave a word.</div>
-            <button class="submit-btn" id="submitBtn">SEND</button>
+        <div class="details">
+            <p>
+                Ceremony <span class="underline">starts promptly at 7:30PM.</span> Please ensure you are in your seats by then.
+            </p>
+            <p>
+                <span class="underline">Doors close 7:20PM.</span>
+            </p>
+            <p>
+                Ceremony will be 20 minutes in length;
+                allocate an hour of your evening to The Wedding.
+            </p>
+            <p class="underline">Please come dressed in black.</p>
         </div>
     </div>
 
     <script>
-        const startTime = Date.now(); 
         const doilyImg = document.getElementById('animatedDoily');
         const content = document.getElementById('mainContent');
-        const submitBtn = document.getElementById('submitBtn');
-        const scriptURL = 'https://script.google.com/macros/s/AKfycbxM3PZNNVc9kaYFS4i4jzngqZ-sPQOIF2-an-Vx9M1_HKl8U_Ch59xSet_4RDg992BZTg/exec';
+        const scriptURL = 'https://script.google.com/macros/s/AKfycbziZvz1_hLi_fZtgNCWmr1Py3KiHMSDq-dGWZaH7btYa1Xk6TgfYOYiXkEODlby3kgpJw/exec';
 
         for (let i = 1; i <= 6; i++) {
             new Image().src = `doily_${i}.png`;
         }
 
-        submitBtn.addEventListener('click', function() {
-            const wordValue = document.getElementById('farewellWord').value;
-            const error = document.getElementById('errorMessage');
-
-            if (!wordValue.trim()) {
-                error.style.display = 'block';
-                return;
-            }
-            error.style.display = 'none';
-
-            const duration = ((Date.now() - startTime) / 1000).toFixed(3) + "s";
-
-            content.classList.add('hidden');
-            runReverseAnimation();
-
-            fetch(scriptURL, { 
-                method: 'POST', 
-                mode: 'no-cors', 
-                body: new URLSearchParams({ 
-                    'farewell_word': wordValue,
-                    'duration': duration 
-                }) 
-            }).catch(err => console.error(err));
-        });
-
-        function runReverseAnimation() {
-            let frame = 6;
+        doilyImg.addEventListener('click', function() {
+            if (this.classList.contains('final')) return;
+            let frame = 1;
+            doilyImg.style.pointerEvents = 'none';
             const totalFrames = 6;
             const intervalTime = 2500 / totalFrames; 
 
-            const reverseAnimation = setInterval(() => {
-                frame--;
+            const animation = setInterval(() => {
+                frame++;
                 const scaleValue = 1 + ((frame - 1) * (2.16 / (totalFrames - 1)));
                 doilyImg.style.transform = `translate(-50%, -50%) scale(${scaleValue})`;
                 
-                if (frame >= 1) {
+                if (frame <= totalFrames) {
                     doilyImg.src = `doily_${frame}.png`;
                 }
 
-                if (frame === 1) {
-                    clearInterval(reverseAnimation);
+                if (frame === totalFrames) {
+                    clearInterval(animation);
+                    doilyImg.classList.add('final');
+                    content.classList.add('visible');
                 }
             }, intervalTime);
-        }
+        });
+
+        const rsvpToggle = document.getElementById('rsvpToggle');
+        rsvpToggle.addEventListener('click', function() {
+            const name = document.getElementById('name').value;
+            const email = document.getElementById('email').value;
+            const error = document.getElementById('errorMessage');
+            const success = document.getElementById('successMessage');
+
+            // 1. Validation Check
+            if (!name.trim() || !email.trim()) {
+                error.style.display = 'block';
+                return;
+            }
+
+            // 2. Immediate Visual Feedback
+            error.style.display = 'none';
+            success.style.display = 'block'; // Show heart instantly
+            this.classList.add('active');
+            this.style.pointerEvents = 'none'; // Disable further clicks
+
+            // 3. Background Data Submission
+            fetch(scriptURL, { 
+                method: 'POST', 
+                mode: 'no-cors', 
+                body: new URLSearchParams({ 'name': name, 'email': email }) 
+            })
+            .catch(err => console.error('Data failed to send in background:', err.message));
+        });
     </script>
 </body>
 </html>
